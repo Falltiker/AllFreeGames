@@ -1,15 +1,15 @@
+
 # AllFreeGames
 
 ## Description
 
-AllFreeGames is a Python-based project designed to parse Epic Games, Steam, and GOG platforms for free games currently being offered. The program checks these platforms for giveaways and provides users with a list of free games they can claim.
+AllFreeGames is a Python-based project designed to parse Epic Games and GOG platforms for free games currently being offered. The program checks these platforms for giveaways and provides users with a list of free games they can claim.
 
 ## Features
 
-- Parses Epic Games Store, Steam, and GOG for free games.
+- Parses Epic Games Store and GOG for free games.
 - Displays up-to-date free game offers in the terminal or exports them to a file.
-- Regular updates of the game lists.
-- Future support for additional platforms (e.g., Go).
+- Future support for additional platforms (e.g., Steam).
 
 ## Installation
 
@@ -36,30 +36,13 @@ Run the script to check for free games:
 python main.py
 ```
 
-The program will fetch and display free games from the supported platforms.
-
-### Command-line Options:
-
-- `-p` or `--platform` — Specify which platform to check for free games. Supported platforms: `epic`, `steam`, `gog`. Example:
-
-  ```bash
-  python main.py -p epic
-  ```
-
-- `-o` or `--output` — Save the results to a file:
-
-  ```bash
-  python main.py -o report.txt
-  ```
+The program will fetch and display free games from the supported platforms (Epic Games Store and GOG).
 
 ## Example Output
 
 ```
 Epic Games Store:
 - "The World Next Door" - Free until April 1
-
-Steam:
-- "Brawlhalla" - Free until March 30
 
 GOG:
 - "Shadow Warrior Classic" - Free until April 5
