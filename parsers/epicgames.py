@@ -12,6 +12,9 @@ def get_free_epic_games(locale="ru", country="UA"):
     response = requests.get(url, params=params)
     data = response.json()
 
+    # with open("1.json", "w", encoding="utf-8") as f:
+    #     json.dump(data, f, indent=4, ensure_ascii=False)
+
     games = data['data']['Catalog']['searchStore']['elements']
     free_games = []
 
@@ -19,6 +22,11 @@ def get_free_epic_games(locale="ru", country="UA"):
         title = game.get("title", "Без названия")
         if "Mystery Game" in title:
             continue
+
+        image = []
+        image_temp = game.get("keyImages")
+        for img in image_temp:
+            image.append(img.get("url"))
 
         slug = game.get("productSlug")
         if slug:
@@ -36,32 +44,34 @@ def get_free_epic_games(locale="ru", country="UA"):
         offer = None
 
         # Берем либо текущие, либо будущие раздачи
-        if promotions and promotions.get("promotionalOffers"):
-            offer = promotions['promotionalOffers'][0]['promotionalOffers'][0]
-        elif promotions and promotions.get("upcomingPromotionalOffers"):
-            offer = promotions['upcomingPromotionalOffers'][0]['promotionalOffers'][0]
+        if game.get("effectiveDate"):
+            start = game.get("effectiveDate")
+        else:
+            continue
+        if game.get("expiryDate"):
+            end = game.get("expiryDate")
+        else:
+            continue
 
-        if offer:
-            start = offer.get("startDate")
-            end = offer.get("endDate")
-            try:
-                start = datetime.fromisoformat(start.replace("Z", "+00:00")).strftime("%d.%m.%Y")
-                end = datetime.fromisoformat(end.replace("Z", "+00:00")).strftime("%d.%m.%Y")
-            except:
-                start = end = "?"
+        try:
+            start = datetime.fromisoformat(start.replace("Z", "+00:00")).strftime("%d.%m.%Y")
+            end = datetime.fromisoformat(end.replace("Z", "+00:00")).strftime("%d.%m.%Y")
+        except:
+            start = end = "?"
 
-            free_games.append({
-                "title": title,
-                "description": description,
-                "url": url,
-                "start_date": start,
-                "end_date": end
-            })
+        free_games.append({
+            "title": title,
+            "image": image,
+            "description": description,
+            "url": url,
+            "start_date": start,
+            "end_date": end
+        })
 
     # Markdown
     md = "## 🎮 Бесплатные игры из Epic Games Store\n\n"
     md += "| Игра | Даты раздачи | Ссылка |\n|------|----------------|--------|\n"
     for g in free_games:
-        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
+        md += f"| {g['title']} | [картинка]({g['image'][0]}) | [Ссылка]({g['url']}) |\n"
 
     return free_games, md
