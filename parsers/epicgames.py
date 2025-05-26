@@ -1,10 +1,18 @@
 import requests
-import json
 import logging
 from datetime import datetime
 
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("epic_log.log", mode="w", encoding="utf-8"),
+        logging.StreamHandler()
+    ]
+)
+
 def get_free_epic_games(locale="ru", country="UA"):
-    logging.info("Запрашиваем список бесплатных игр из Epic Games Store.")
     url = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
     params = {
         "locale": locale,
@@ -12,84 +20,105 @@ def get_free_epic_games(locale="ru", country="UA"):
         "allowCountries": country
     }
 
+    logging.info("Отправка запроса на сервер Epic Games...")
     try:
         response = requests.get(url, params=params)
         response.raise_for_status()
         data = response.json()
-        logging.info("Данные успешно получены от API.")
-    except requests.RequestException as e:
-        logging.exception("Ошибка при получении данных из API Epic Games.")
-        raise
-
-    with open("1.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-        logging.debug("Данные API сохранены в 1.json для отладки.")
+        logging.info("Данные успешно получены.")
+    except Exception as e:
+        logging.error(f"Ошибка при получении данных от Epic Games: {e}")
+        return {}, ""
 
     games = data['data']['Catalog']['searchStore']['elements']
-    free_games = []
+    logging.info(f"Получено {len(games)} игр из API.")
+
+    free_games = {
+        "current": [],
+        "upcoming": []
+    }
+
+    current_date = datetime.now().date()
 
     for i, game in enumerate(games, start=1):
         title = game.get("title", "Без названия")
-        logging.debug(f"[{i}] Проверяется игра: {title}")
+        logging.debug(f"[{i}] Проверка игры: {title}")
 
-        if "Mystery Game" in title or "LISA: Definitive Edition" in title:
-            logging.debug(f"[{i}] Пропущена игра Mystery Game.")
+        if "Mystery Game" in title:
+            logging.info(f"[{i}] Пропущена игра '{title}' (Mystery Game).")
             continue
 
         image = [img.get("url") for img in game.get("keyImages", [])]
         if not image:
             logging.warning(f"[{i}] У игры '{title}' нет изображений.")
 
-
         slug = game.get("productSlug")
-        logging.debug(f"[{i}] У игры '{title}' productSlug = {slug}.")
-
-        categories = game.get("categories", [])
-        category = categories[0]["path"] if categories else "unknown"
+        if not slug:
+            logging.warning(f"[{i}] У игры '{title}' отсутствует productSlug.")
+        category = game["categories"][0]["path"] if game.get("categories") else "unknown"
 
         if slug:
             url = f"https://store.epicgames.com/ru/{'bundles' if category == 'bundles' else 'p'}/{slug}"
         else:
-            logging.warning(f"[{i}] У игры '{title}' отсутствует productSlug.")
-            continue
             url = None
 
         description = game.get("description", "")
+        promotions = game.get("promotions", {})
+        if not promotions:
+            logging.info(f"[{i}] У игры '{title}' отсутствуют акции.")
+            continue
 
+        promotional_offers = promotions.get('promotionalOffers', [])
+        if not promotional_offers:
+            logging.info(f"[{i}] У игры '{title}' нет активных раздач.")
+            continue
 
-        # Числа в которые игра будет бесплатная
-        # Пока что, нормально не работает
+        offers = promotional_offers[0].get('promotionalOffers', [])
+        for promo in offers:
+            if promo.get("discountSetting", {}).get("discountPercentage") == 0:
+                start = promo.get("startDate")
+                end = promo.get("endDate")
+                try:
+                    start_date = datetime.fromisoformat(start.replace("Z", "+00:00")).date()
+                    end_date = datetime.fromisoformat(end.replace("Z", "+00:00")).date()
+                except Exception as e:
+                    logging.warning(f"[{i}] Ошибка парсинга дат у игры '{title}': {e}")
+                    start_date = end_date = None
 
-        # start = game.get("effectiveDate")
-        # end = game.get("expiryDate")
-
-        # if not start or not end:
-        #     logging.info(f"[{i}] Пропущена игра '{title}' — отсутствует effectiveDate или expiryDate.")
-        #     continue
-
-        # try:
-        #     start_fmt = datetime.fromisoformat(start.replace("Z", "+00:00")).strftime("%d.%m.%Y")
-        #     end_fmt = datetime.fromisoformat(end.replace("Z", "+00:00")).strftime("%d.%m.%Y")
-        # except Exception as e:
-        #     logging.warning(f"[{i}] Ошибка при парсинге дат у '{title}': {e}")
-        #     start_fmt = end_fmt = "?"
-
-        free_games.append({
-            "title": title,
-            "image": image,
-            "description": description,
-            "url": url
-            # "start_date": start_fmt,
-            # "end_date": end_fmt
-        })
-        logging.info(f"[{i}] Игра '{title}' добавлена в список")
-
-    logging.info(f"Обработано {len(free_games)} бесплатных игр.")
+                if start_date and end_date and start_date <= current_date <= end_date:
+                    logging.info(f"[{i}] Игра '{title}' сейчас бесплатна.")
+                    free_games["current"].append({
+                        "title": title,
+                        "description": description,
+                        "url": url,
+                        "start_date": start_date.strftime("%d.%m.%Y"),
+                        "end_date": end_date.strftime("%d.%m.%Y"),
+                    })
+                elif start_date and start_date > current_date:
+                    logging.info(f"[{i}] Игра '{title}' будет раздаваться в будущем.")
+                    free_games["upcoming"].append({
+                        "title": title,
+                        "description": description,
+                        "url": url,
+                        "start_date": start_date.strftime("%d.%m.%Y"),
+                        "end_date": end_date.strftime("%d.%m.%Y"),
+                    })
 
     # Markdown
     md = "## 🎮 Бесплатные игры из Epic Games Store\n\n"
+    md += "### Сейчас бесплатно:\n\n"
     md += "| Игра | Даты раздачи | Ссылка |\n|------|----------------|--------|\n"
-    for g in free_games:
-        md += f"| {g['title']} | [картинка]({g['image'][0] if g['image'] else 'нет'}) | [Ссылка]({g['url']}) |\n"
+    for g in free_games["current"]:
+        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
 
+    md += "\n### Будущие раздачи:\n\n"
+    for g in free_games["upcoming"]:
+        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
+
+    logging.info("Формирование markdown завершено.")
     return free_games, md
+
+
+# Тестовый запуск
+if __name__ == "__main__":
+    get_free_epic_games()

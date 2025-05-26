@@ -1,14 +1,13 @@
 import logging
 import json
-# from parsers.epicgames import get_free_epic_games
-from epicgamesV2 import get_free_epic_games
+from parsers.epicgames import get_free_epic_games
 
 # Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("log.log", mode="w", encoding="utf-8"),
+        logging.FileHandler("logging.log", mode="w", encoding="utf-8"),
         logging.StreamHandler()
     ]
 )
