@@ -1,24 +1,26 @@
-[
-  {
-    "title": "Neko Ghost, Jump!",
-    "image": [
-      "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/Gift_1920x1080_wrap-b_1920x1080-d6e0c4f1fa0962bbb9b30317081c5b6d",
-      "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/Gift_1920x1080_wrap-a1_1920x1080-7644d526b2a7dcdc7ca5787446ce0c0d"
+{
+    "current": [
+        {
+            "title": "Sifu",
+            "description": "Sifu",
+            "url": "https://store.epicgames.com/ru/p/sifu",
+            "start_date": "22.05.2025",
+            "end_date": "29.05.2025"
+        },
+        {
+            "title": "Gigapocalypse",
+            "description": "Gigapocalypse",
+            "url": "https://store.epicgames.com/ru/p/gigapocalypse-fdc53b",
+            "start_date": "22.05.2025",
+            "end_date": "29.05.2025"
+        },
+        {
+            "title": "Deliver At All Costs",
+            "description": "Deliver At All Costs is a thrilling action game where destruction, absurdity and intrigue collide! Join Winston Green, a down-on-his-luck courier with a fiery temper and a mysterious past — as he delivers highly unconventional cargo, leaving a trail of havoc and chaos behind him.",
+            "url": "https://store.epicgames.com/ru/p/deliver-at-all-costs-a30c8d",
+            "start_date": "22.05.2025",
+            "end_date": "29.05.2025"
+        }
     ],
-    "description": "Neko Ghost, Jump! is a puzzle-platformer where you not only switch between 2D & 3D camera perspectives but also between your physical & ghost forms to solve puzzles, combat enemies, and clear levels faster.",
-    "url": "https://store.epicgames.com/ru/p/neko-ghost-jump",
-    "start_date": "27.03.2025",
-    "end_date": "03.04.2025"
-  },
-  {
-    "title": "Cat Quest",
-    "image": [
-      "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/CQ_Gift_1920x1080_wrap-b_1920x1080-d6743a93b51240dab421e4f48d0e95d5",
-      "https://cdn1.epicgames.com/offer/d5241c76f178492ea1540fce45616757/CQ_Gift_1920x1080_wrap-a1_1920x1080-f145f9945a78d880facf5d2f374aaf77"
-    ],
-    "description": "The multi award-winning Action RPG. Cat Quest's loot-fuelled cat-venture is as beautifully crafted, as its combat and magic are ultra-satisfying. Universally adored by critics - it'll have you purring for joy!",
-    "url": "https://store.epicgames.com/ru/p/cat-quest-8373e0",
-    "start_date": "27.03.2025",
-    "end_date": "03.04.2025"
-  }
-]
+    "upcoming": []
+}

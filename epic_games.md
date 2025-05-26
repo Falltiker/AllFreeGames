@@ -1,6 +1,12 @@
 ## 🎮 Бесплатные игры из Epic Games Store
 
+### Сейчас бесплатно:
+
 | Игра | Даты раздачи | Ссылка |
 |------|----------------|--------|
-| Neko Ghost, Jump! | 27.03.2025 — 03.04.2025 | [Ссылка](https://store.epicgames.com/ru/p/neko-ghost-jump) |
-| Cat Quest | 27.03.2025 — 03.04.2025 | [Ссылка](https://store.epicgames.com/ru/p/cat-quest-8373e0) |
+| Sifu | 22.05.2025 — 29.05.2025 | [Ссылка](https://store.epicgames.com/ru/p/sifu) |
+| Gigapocalypse | 22.05.2025 — 29.05.2025 | [Ссылка](https://store.epicgames.com/ru/p/gigapocalypse-fdc53b) |
+| Deliver At All Costs | 22.05.2025 — 29.05.2025 | [Ссылка](https://store.epicgames.com/ru/p/deliver-at-all-costs-a30c8d) |
+
+### Будущие раздачи:
+

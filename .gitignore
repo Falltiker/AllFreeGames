@@ -16,4 +16,7 @@ __pycache__/
 
 # Personal files and configurations
 1.json
-epicgames 2.0.py
+epicgamesV2.py
+epic_games.json
+epic_games.md
+log.log
