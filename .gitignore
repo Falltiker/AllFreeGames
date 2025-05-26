@@ -15,7 +15,6 @@ __pycache__/
 .idea/
 
 # Personal files and configurations
-1.json
 epicgamesV2.py
 epic_games.json
 epic_games.md

@@ -2,16 +2,6 @@ import requests
 import logging
 from datetime import datetime
 
-# Настройка логирования
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("epic_log.log", mode="w", encoding="utf-8"),
-        logging.StreamHandler()
-    ]
-)
-
 def get_free_epic_games(locale="ru", country="UA"):
     url = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
     params = {
