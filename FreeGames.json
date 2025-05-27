@@ -1,0 +1,54 @@
+{
+    "epic_games": {
+        "current": [
+            {
+                "title": "Sifu",
+                "description": "Sifu",
+                "url": "https://store.epicgames.com/ru/p/sifu",
+                "start_date": "22.05.2025",
+                "end_date": "29.05.2025"
+            },
+            {
+                "title": "Gigapocalypse",
+                "description": "Gigapocalypse",
+                "url": "https://store.epicgames.com/ru/p/gigapocalypse-fdc53b",
+                "start_date": "22.05.2025",
+                "end_date": "29.05.2025"
+            },
+            {
+                "title": "Deliver At All Costs",
+                "description": "Deliver At All Costs is a thrilling action game where destruction, absurdity and intrigue collide! Join Winston Green, a down-on-his-luck courier with a fiery temper and a mysterious past — as he delivers highly unconventional cargo, leaving a trail of havoc and chaos behind him.",
+                "url": "https://store.epicgames.com/ru/p/deliver-at-all-costs-a30c8d",
+                "start_date": "22.05.2025",
+                "end_date": "29.05.2025"
+            }
+        ],
+        "upcoming": []
+    },
+    "steam_games": [
+        {
+            "title": "Like a Dragon: Pirate Yakuza in Hawaii - Kazuma Kiryu Special Outfit",
+            "url": "https://store.steampowered.com/app/3184050/Like_a_Dragon_Pirate_Yakuza_in_Hawaii__Kazuma_Kiryu_Special_Outfit/?snr=1_7_7_2300_150_1",
+            "image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3184050/a4f134aa02c7232d7784baca30a42461f161dc8f/capsule_sm_120.jpg?t=1746707132",
+            "description": "Описание не найдено",
+            "discounted_price": 0.0,
+            "currency_symbol": "₴",
+            "original_price": "64,00₴",
+            "developer": {
+                "name": "Ryu Ga Gotoku Studio",
+                "url": "https://store.steampowered.com/developer/RyuGaGotokuStudio?snr=1_5_9__2000"
+            },
+            "publisher": {
+                "name": "SEGA",
+                "url": "https://store.steampowered.com/publisher/Sega?snr=1_5_9__2000"
+            },
+            "release_date": "20 Feb, 2025",
+            "recent_reviews": "96% of the 50 user reviews for this game are positive.",
+            "all_reviews": "96% of the 50 user reviews for this game are positive.",
+            "dlc": {
+                "name": "Like a Dragon: Pirate Yakuza in Hawaii",
+                "url": "https://store.steampowered.com/app/3061810/"
+            }
+        }
+    ]
+}

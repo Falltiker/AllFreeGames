@@ -1,61 +1,100 @@
+# Free Games Parser
 
-# AllFreeGames
+Скрипт для получения бесплатных игр из **Epic Games Store** и **Steam**.
 
-## Description
+Этот проект собирает информацию о бесплатных играх, формирует отчёты в форматах **JSON** и **Markdown**, и сохраняет их в файлы.
 
-AllFreeGames is a Python-based project designed to parse Epic Games and GOG platforms for free games currently being offered. The program checks these platforms for giveaways and provides users with a list of free games they can claim.
+---
 
-## Features
+## Файл FreeGames.md
 
-- Parses Epic Games Store and GOG for free games.
-- Displays up-to-date free game offers in the terminal or exports them to a file.
-- Future support for additional platforms (e.g., Steam).
+Удобно, хорошо читабельный вывод.
+![Содержимое FreeGames.md]()
 
-## Installation
+---
 
-To get started with AllFreeGames, clone the repository and install the necessary dependencies.
+## 🔧 Установка
 
-1. Clone the repository:
+1. Клонируй репозиторий или скачай архив с кодом.
+2. Установи зависимости:
 
-   ```bash
-   git clone https://github.com/Falltiker/AllFreeGames.git
-   cd AllFreeGames
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-2. Install dependencies:
+---
 
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Usage
-
-Run the script to check for free games:
+## 🚀 Использование
 
 ```bash
 python main.py
 ```
 
-The program will fetch and display free games from the supported platforms (Epic Games Store and GOG).
+После запуска ты получишь:
 
-## Example Output
+- `FreeGames.json` — файл со структурированной информацией о всех играх.
+- `epic_games.md` — красиво отформатированный Markdown-отчёт.
+- `logging.log` — лог-файл выполнения скрипта.
+
+---
+
+## 🗂 Структура проекта
 
 ```
-Epic Games Store:
-- "The World Next Door" - Free until April 1
-
-GOG:
-- "Shadow Warrior Classic" - Free until April 5
+.
+├── main.py
+├── parsers/
+│   ├── __init__.py
+│   ├── epicgames.py
+│   └── steam.py
+├── requirements.txt
+├── FreeGames.json
+├── epic_games.md
+└── logging.log
 ```
 
-## Contributing
+---
 
-Feel free to fork the repository, make changes, and submit pull requests. Contributions are always welcome!
+## 📚 Использование парсеров отдельно
 
-## License
+Вы можеште использовать функции парсинга и в своих проектах:
 
-This project is licensed under the MIT License.
+### Epic Games Store
 
-## Contact
+```python
+from parsers.epicgames import get_games_epicgames
 
-For questions or feedback, please open an issue in the repository or contact me at email@example.com.
+games = get_games_epicgames(locale="ru", country="UA")
+print(games)
+```
+
+### Steam
+
+```python
+from parsers.steam import get_games_steam
+
+games = get_games_steam()
+print(games)
+```
+
+Чтобы использовать только парсеры:
+
+1. Помести папку `parsers` в свой проект.
+2. Импортируйте нужную функцию и вызывайте.
+
+---
+
+## 🧩 Зависимости
+
+Все зависимости перечислены в `requirements.txt`, вот основные:
+
+- `requests`
+- `beautifulsoup4`
+- `lxml`
+- `fake-useragent`
+
+---
+
+## 📜 Лицензия
+
+Этот проект лицензирован по лицензии [MIT](LICENSE). Подробности смотри в файле LICENSE.

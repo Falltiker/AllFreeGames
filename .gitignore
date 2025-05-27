@@ -15,7 +15,4 @@ __pycache__/
 .idea/
 
 # Personal files and configurations
-epicgamesV2.py
-epic_games.json
-epic_games.md
 logging.log

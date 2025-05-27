@@ -2,7 +2,7 @@ import requests
 import logging
 from datetime import datetime
 
-def get_free_epic_games(locale="ru", country="UA"):
+def get_games_epicgames(locale="ru", country="UA"):
     url = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions"
     params = {
         "locale": locale,
@@ -94,21 +94,9 @@ def get_free_epic_games(locale="ru", country="UA"):
                         "end_date": end_date.strftime("%d.%m.%Y"),
                     })
 
-    # Markdown
-    md = "## 🎮 Бесплатные игры из Epic Games Store\n\n"
-    md += "### Сейчас бесплатно:\n\n"
-    md += "| Игра | Даты раздачи | Ссылка |\n|------|----------------|--------|\n"
-    for g in free_games["current"]:
-        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
-
-    md += "\n### Будущие раздачи:\n\n"
-    for g in free_games["upcoming"]:
-        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
-
-    logging.info("Формирование markdown завершено.")
-    return free_games, md
+    return free_games
 
 
 # Тестовый запуск
 if __name__ == "__main__":
-    get_free_epic_games()
+    get_games_epicgames()

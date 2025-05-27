@@ -1,124 +1,130 @@
-# Получаем список всех игор и длс со скидкой в 100% со стима
-# Отправляет get запрос, что бы получить список
-# Собираю информацию о контенте только названия, цены и ссылки
-
-
 import requests
 import json
 from bs4 import BeautifulSoup as BS
 from fake_useragent import UserAgent
+import logging
 
 
 
-def main():
+def get_games_steam():
     headers = {
         'Referer': 'https://store.steampowered.com/search/?force_infinite=1&maxprice=free&specials=1&ndl=1',
         'User-Agent': UserAgent().random,
         'Accept': '*/*',
     }
 
-    params = {
-        'force_infinite': '1',
-        'maxprice': 'free',
-        'specials': '1',
-        'ndl': '1',
-        'snr': '1_7_7_2300_7',
-    }
-
-    # with open("index.html", "r", encoding="utf-8") as f:
-    #     res = f.read()
-    # res = BS(res, "lxml")
-
     # Отправляем запрос и получаем в ответ безплатные длс и игры
-    response = requests.get('https://store.steampowered.com/search/results', params=params, headers=headers)
+    response = requests.get('https://store.steampowered.com/search/results?force_infinite=1&maxprice=free&specials=1&ndl=1&snr=1_7_7_230_7', headers=headers)
     soup = BS(response.text, "lxml")
-    
-    # with open("index.html", "w", encoding="utf-8") as f:
-    #     f.write(str(soup))
+    logging.info("Отправка запроса на сервер Steam...")
 
-    # Каждый блок с игрой <a>, делаем список для удобства
-    res = soup.find_all("a")
+    all_games = soup.find("div", id="search_resultsRows")
+    all_games = all_games.find_all("a")
+    logging.info(f"Получено {len(all_games)} игр из API.")
+    games_list = list()
+    for game in all_games:
+        try:
+            title = game.find("span", class_="title").text
+            logging.info(f"Обработка игры: {title}")
+            # Проверяем, что игра бесплатная
+            discounted_price_tag = game.find("div", class_="discount_final_price")
+            discounted_price = discounted_price_tag.text.strip() if discounted_price_tag else 0
+            currency_symbol = discounted_price[-1] # Сохраняем символ валюты
+            discounted_price = str(discounted_price).replace(",", ".")[:-1]  # Убираем знак валюты, меняем запятую на точку для преобразования в float
+            discounted_price = float(discounted_price)
+            logging.debug(f"Цена игры {title}: {discounted_price}{currency_symbol}")
+            # Проверяем, что цена нулевая. Не знаю почему, но иногда игра может быть не со 100% скидкой, хотя фильтр я поставил нормально.
+            if discounted_price != 0:
+                logging.debug(f"Игра {title} не бесплатна, цена: {discounted_price}")
+                continue
 
-    # Получаем информицаю игор со списка
-    games_dict = dict()
-    for i in res:
-        name = i.find("span").text
-        url =  i["href"]
-        # img =  i.find("img")["src"]
-        # date = i.find("div", class_="col search_released responsive_secondrow").text.strip()
-        price =i.find("div", class_="discount_original_price")
-        # Класы меняется, заметил сходность что discount_final_price это длс до контента
-        if price:
-            price = price.text.strip()
-            dlc = None # Заметил сходность, по класу блока цены можно опредилить доп контент
-        else:
-            price = i.find("div", class_="discount_final_price").text.strip()
-            dlc = True # Заметил сходность, по класу блока цены можно опредилить доп контент
+            url = game.get("href")
+            logging.debug(f"URL игры {title}: {url}")
+            image = game.find("div", class_="search_capsule").find("img").get("src")
+            logging.debug(f"Изображение игры {title}: {image}")
+            original_price = game.find("div", class_="discount_original_price")
+            logging.debug(f"Цена без скидки {title}: {original_price.text.strip() if original_price else 'Нет оригинальной цены'}")
 
-        platforms_temp = i.find("div", class_="col search_name ellipsis").find_all("span")[1:]
-        # Получем в удобном виде платформы поддерживаюшие игру
-        platforms = list()
-        for platform in platforms_temp:
-            platforms.append(str(platform["class"][-1]))
-
-
-        # Если нашли бесплатное длс, смотрим какая игра нужна для него и информацию о ней
-        if dlc:
-            # Заходим на страницу длс
-            res = requests.get(url, headers=headers, params=params)
+            res = requests.get(url)
             soup = BS(res.text, "lxml")
+            logging.debug(f"Получен HTML-код страницы игры {title}.")
 
-            # Получаем и переходим ссылку на контент к которому длс 
-            dlc_url = soup.find("div", class_="game_area_bubble game_area_dlc_bubble").find("a")["href"]
+            desc_tag = soup.find("div", class_="game_description_snippet")
+            description = desc_tag.text.strip() if desc_tag else "Описание не найдено"
+            logging.debug(f"Описание игры {title}: {description}")
 
-            res = requests.get(dlc_url, params=params, headers=headers)
-            soup = BS(res.text, "lxml")
+            mini_div_info = soup.find("div", class_="glance_ctn_responsive_left")
 
-            # Получаем информацию о нашей игре
-            dlc_name = soup.find("div", id="appHubAppName").text.strip()
-            # dlc_img = soup.find("div", id="gameHeaderImageCtn").find("img")["src"]
-            dlc_price_free = soup.find("a", class_="btn_green_steamui btn_medium").text.strip()
-            if str(dlc_price_free) in "Играть":
-                dlc_price = "Free"
+            reviews = mini_div_info.find_all("div", class_="user_reviews_summary_row")
+            recent_reviews = reviews[0]["data-tooltip-html"]
+            logging.debug(f"Недавние отзывы для игры {title}: {recent_reviews}")
+
+            all_reviews = reviews[-1]["data-tooltip-html"]
+            logging.debug(f"Все отзывы для игры {title}: {all_reviews}")
+
+            release_date_tag = mini_div_info.find("div", class_="date")
+            release_date = release_date_tag.text.strip() if release_date_tag else "Дата выпуска не указана"
+            logging.debug(f"Дата выпуска игры {title}: {release_date}")
+
+            developer_url = mini_div_info.find("div", id="developers_list").find("a")["href"]
+            developer_name_tag = mini_div_info.find("div", id="developers_list").find("a")
+            developer_name = developer_name_tag.text.strip() if developer_name_tag else "Разработчик не указан"
+            developer = {
+                "name": developer_name,
+                "url": developer_url
+            }
+            logging.debug(f"Разработчик игры {title}: {developer_name} ({developer_url})")
+
+            publisher_tag = mini_div_info.find_all("div", class_="dev_row")[-1]
+
+            if publisher_tag:
+                publisher_link = publisher_tag.find("a")
+                publisher_name = publisher_link.text.strip() if publisher_link else "Издатель не указан"
+                publisher_url = publisher_link["href"] if publisher_link and publisher_link.has_attr("href") else "Издатель не указан"
+            else:
+                publisher_name = "Издатель не указан"
+                publisher_url = "Издатель не указан"
+
+            publisher = {
+                "name": publisher_name,
+                "url": publisher_url
+            }
+
+            dlc = soup.find("div", class_="game_area_bubble game_area_dlc_bubble")
+            if dlc:
+                dlc_url = dlc.find("a")["href"]
+                dlc_name_tag = dlc.find("a")
+                dlc_name = dlc_name_tag.text.strip()
                 dlc = {
-                    dlc_name: {
-                        # "img": dlc_img,
-                        "price": dlc_price
-                    }
+                    "name": dlc_name,
+                    "url": dlc_url
                 }
             else:
-                dlc_price_temp = soup.find("div", class_="discount_block game_purchase_discount")
-                dlc_price_original = dlc_price_temp.find("div", "discount_original_price").text.strip()
-                dlc_price_final = dlc_price_temp.find("div", "discount_final_price").text.strip()
+                dlc = None
+            logging.debug(f"DLC - Продукт {title} является дополнением (DLC): {dlc['name']} ({dlc['url']})" if dlc else "DLC не найдено")
 
-                dlc = {
-                    dlc_name: {
-                        # "img": dlc_img,
-                        "price_original": dlc_price_original,
-                        "price_final": dlc_price_final
-                    }
-                }
+            games_list.append({
+                "title": title,
+                "url": url,
+                "image": image,
+                "description": description,
+                "discounted_price": discounted_price,
+                "currency_symbol": currency_symbol,
+                "original_price": original_price.text.strip() if original_price else "Нет оригинальной цены",
+                "developer": developer,
+                "publisher": publisher,
+                "release_date": release_date,
+                "recent_reviews": recent_reviews,
+                "all_reviews": all_reviews,
+                "dlc": dlc
+            })
+            logging.info(f"Игра {title} успешно обработана.")
 
-        # Упаковываем в словарь и сохраняем в json файл
-        games_dict[name] = {
-            "url": url,
-            # "img": img,
-            # "date": date,
-            "price": price,
-            "platform": platforms,
-            # "dlc": dlc
-            
-        }
+        except Exception as e:
+            logging.error(f"Ошибка при обработке игры: {e}")
 
-
-    with open("info.json", "w", encoding="utf-8") as f:
-        json.dump(games_dict, f,indent=4, ensure_ascii=False)
-
-
-    # with open("index.html", "w", encoding="utf-8") as f:
-    #     f.write(str(soup))
-
+        return games_list
 
 
 if __name__ == "__main__":
-    main()
+    get_games_steam()

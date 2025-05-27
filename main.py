@@ -1,6 +1,12 @@
 import logging
 import json
-from parsers.epicgames import get_free_epic_games
+from parsers import steam, epicgames
+
+
+"""Скрипт для получения бесплатных игр из Epic Games Store и Steam.
+Этот скрипт собирает информацию о бесплатных играх из Epic Games Store и Steam,
+формирует отчёт в формате JSON и Markdown, а также сохраняет результаты в файлы.
+Он использует библиотеки requests и BeautifulSoup для парсинга HTML-страниц."""
 
 # Настройка логирования
 logging.basicConfig(
@@ -15,15 +21,42 @@ logging.basicConfig(
 logging.info("Скрипт запущен.")
 
 try:
-    games, markdown = get_free_epic_games()
-    logging.info(f"Сейчас бесплатно {len(games["current"])} игор и {len(games["upcoming"])} в скором будущем будут бесплатны.")
+    games_epic = epicgames.get_games_epicgames()
+    games_steam = steam.get_games_steam()
+    logging.info(f"В EpicGames сейчас бесплатно {len(games_epic["current"])} игор и {len(games_epic["upcoming"])} в скором будущем будут бесплатны.")
+    logging.info(f"В Steam сейчас бесплатно {len(games_steam)} игор.")
 
-    with open("epic_games.json", "w", encoding="utf-8") as jf:
-        json.dump(games, jf, ensure_ascii=False, indent=4)
-        logging.info("Файл epic_games.json успешно сохранён.")
+    # Сохраняем результаты в JSON-файл
+    games_all = {
+        "epic_games": games_epic,
+        "steam_games": games_steam
+    }
+    with open("FreeGames.json", "w", encoding="utf-8") as f:
+        json.dump(games_all, f, ensure_ascii=False, indent=4)
+        logging.info("Файл FreeGames.json успешно сохранён.")
 
-    with open("epic_games.md", "w", encoding="utf-8") as mf:
-        mf.write(markdown)
+    # Формируем Markdown-отчёт
+    games_current = games_epic["current"]
+    games_upcoming = games_epic["upcoming"]
+    md = "## Epic Games Store\n\n"
+    md += "### Сейчас бесплатно:\n\n"
+    md += "| Игра | Даты раздачи | Ссылка |\n|------|----------------|--------|\n"
+    for g in games_current:
+        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
+
+    md += "\n### Будущие раздачи:\n\n"
+    for g in games_upcoming:
+        md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
+
+    md += "\n\n----------------------------------------------\n\n"
+    md += "\n\n## Steam\n\n"
+    md += "| Игра | Ссылка |\n|------|--------|\n"
+    for g in games_steam:
+        md += f"| {g['title']} | [Ссылка]({g['url']}) |\n"
+
+    # Сохраняем Markdown-отчёт в файл
+    with open("FreeGames.md", "w", encoding="utf-8") as mf:
+        mf.write(md)
         logging.info("Файл epic_games.md успешно сохранён.")
 
 
