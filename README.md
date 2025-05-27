@@ -9,7 +9,7 @@
 ## Файл FreeGames.md
 
 Удобно, хорошо читабельный вывод.
-![Содержимое FreeGames.md](img\Markdown.png)
+![Содержимое FreeGames.md](img/Markdown.png)
 
 ---
 
