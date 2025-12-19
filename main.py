@@ -10,7 +10,7 @@ from parsers import steam, epicgames
 
 # Настройка логирования
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler("logging.log", mode="w", encoding="utf-8"),

@@ -55,11 +55,14 @@ def get_games_steam():
 
             mini_div_info = soup.find("div", class_="glance_ctn_responsive_left")
 
-            reviews = mini_div_info.find_all("div", class_="user_reviews_summary_row")
-            recent_reviews = reviews[0]["data-tooltip-html"]
-            logging.debug(f"Недавние отзывы для игры {title}: {recent_reviews}")
+            user_reviews = mini_div_info.find("div", id="userReviews")
+            recent_reviews_row = user_reviews.find_all("a", class_="user_reviews_summary_row")[0]
+            review_summary = recent_reviews_row.find("span", class_="game_review_summary").text.strip()
+            review_count_text = recent_reviews_row.find("span", class_="responsive_hidden").text.strip()
+            review_count = int(review_count_text.strip("()").replace(",", "").replace(" ", ""))
+            logging.debug(f"Недавние отзывы для игры {title}: {review_count} отзывов, общее впечатление: {review_summary}")
 
-            all_reviews = reviews[-1]["data-tooltip-html"]
+            all_reviews = user_reviews.find_all("a", class_="user_reviews_summary_row")[-1]["data-tooltip-html"]
             logging.debug(f"Все отзывы для игры {title}: {all_reviews}")
 
             release_date_tag = mini_div_info.find("div", class_="date")
@@ -114,7 +117,7 @@ def get_games_steam():
                 "developer": developer,
                 "publisher": publisher,
                 "release_date": release_date,
-                "recent_reviews": recent_reviews,
+                "recent_reviews": review_count,
                 "all_reviews": all_reviews,
                 "dlc": dlc
             })
@@ -123,7 +126,7 @@ def get_games_steam():
         except Exception as e:
             logging.error(f"Ошибка при обработке игры: {e}")
 
-        return games_list
+    return games_list
 
 
 if __name__ == "__main__":
