@@ -17,10 +17,19 @@ def get_games_steam():
     response = requests.get('https://store.steampowered.com/search/results?force_infinite=1&maxprice=free&specials=1&ndl=1&snr=1_7_7_230_7', headers=headers)
     soup = BS(response.text, "lxml")
     logging.info("Отправка запроса на сервер Steam...")
+    
+    try:
+        all_games = soup.find("div", id="search_resultsRows")
+        logging.info(f"Получено {len(all_games)} игр из API.")
+        if not all_games:
+            logging.warning("Список игр пуст.")
+            return 
+        all_games = all_games.find_all("a")
 
-    all_games = soup.find("div", id="search_resultsRows")
-    all_games = all_games.find_all("a")
-    logging.info(f"Получено {len(all_games)} игр из API.")
+    except Exception as e:
+        logging.error(f"Ошибка при получении списка игр: {e}")
+        return
+    
     games_list = list()
     for game in all_games:
         try:

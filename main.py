@@ -10,7 +10,7 @@ from parsers import steam, epicgames
 
 # Настройка логирования
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler("logging.log", mode="w", encoding="utf-8"),
@@ -22,9 +22,13 @@ logging.info("Скрипт запущен.")
 
 try:
     games_epic = epicgames.get_games_epicgames()
-    games_steam = steam.get_games_steam()
     logging.info(f"В EpicGames сейчас бесплатно {len(games_epic["current"])} игор и {len(games_epic["upcoming"])} в скором будущем будут бесплатны.")
-    logging.info(f"В Steam сейчас бесплатно {len(games_steam)} игор.")
+    
+    games_steam = steam.get_games_steam()
+    if not games_steam:
+        logging.info("В Steam нет бесплатных игр. Завершаем работу скрипта.")
+    else:
+        logging.info(f"В Steam сейчас бесплатно {len(games_steam)} игор.")
 
     # Сохраняем результаты в JSON-файл
     games_all = {
@@ -48,11 +52,12 @@ try:
     for g in games_upcoming:
         md += f"| {g['title']} | {g['start_date']} — {g['end_date']} | [Ссылка]({g['url']}) |\n"
 
-    md += "\n\n----------------------------------------------\n\n"
-    md += "\n\n## Steam\n\n"
-    md += "| Игра | Ссылка |\n|------|--------|\n"
-    for g in games_steam:
-        md += f"| {g['title']} | [Ссылка]({g['url']}) |\n"
+    if games_steam:
+        md += "\n\n----------------------------------------------\n\n"
+        md += "\n\n## Steam\n\n"
+        md += "| Игра | Ссылка |\n|------|--------|\n"
+        for g in games_steam:
+            md += f"| {g['title']} | [Ссылка]({g['url']}) |\n"
 
     # Сохраняем Markdown-отчёт в файл
     with open("FreeGames.md", "w", encoding="utf-8") as mf:
